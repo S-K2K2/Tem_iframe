@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Live Sensor1 Data Chart</title>
+        <script src="https://code.highcharts.com/stock/highstock.js"></script>
+        <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+        <script src="https://www.unpkg.com/@eohjsc/era-widget@1.0.14/src/index.js"></script>
+        <style>
+            #container {
+    height: 400px;
+    min-width: 310px;
+}
+
+        </style>
+    </head>
+    <body>
+        
+        <figure class="highcharts-figure">
+            <div id="container"></div>
+            <button id="exportButton">Export to Excel</button>
+        </figure>
+
+<input type="checkbox" id="Nhiet do"></input>
+<script>
+     // Era Widget initialization
+     const eraWidget = new EraWidget();
+        let config = null;
+        let sensor7Value = 0; // Khởi tạo giá trị giá trị mặc định
+        const dataBuffer = [];
+
+        eraWidget.onConfiguration((configuration) => {
+            config = configuration.realtime_configs[0];
+        });
+
+        eraWidget.onValues((values) => {
+            const input = document.getElementById('Dong dien');
+            sensor7Value = values[config.id].value; // Giả sử values[config.id].value là giá trị thực tế
+            input.checked = values[config.id].value > 0; // Đặt trạng thái của checkbox dựa trên giá trị
+        });
+
+        eraWidget.ready();
+        // Create the chart
+Highcharts.stockChart('container', {
+    chart: {
+        events: {
+            load: function () {
+
+                // set up the updating of the chart each second
+                const series = this.series[0];
+                setInterval(function () {
+                    const x = (new Date()).getTime(), // current time
+                        y = sensor7Value;
+                    series.addPoint([x, y], true, true);
+                    dataBuffer.push([x, y]);
+                }, 1000);
+            }
+        }
+    },
+
+    accessibility: {
+        enabled: false
+    },
+
+    time: {
+        useUTC: false
+    },
+
+    rangeSelector: {
+        buttons: [{
+            count: 1,
+            type: 'minute',
+            text: '1M'
+        }, {
+            count: 5,
+            type: 'minute',
+            text: '5M'
+        }, {
+            type: 'all',
+            text: 'All'
+        }],
+        inputEnabled: false,
+        selected: 0
+    },
+
+    title: {
+        text: 'Nhiệt độ'
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    series: [{
+        name: 'Nhietdo',
+        data: (function () {
+            // generate an array of random data
+            const data = [],
+                time = (new Date()).getTime();
+
+            for (let i = -999; i <= 0; i += 1) {
+                data.push([
+                    time + i * 1000,
+                    sensor7Value
+                ]);
+            }
+            return data;
+        }())
+    }]
+});
+
+        document.getElementById('exportButton').addEventListener('click', function () {
+        const ws = XLSX.utils.json_to_sheet(dataBuffer.map(point => ({
+        Time: (new Date(point[0])).toLocaleString(),
+        Nhietdo: point[1]
+        })));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Nhietdo');
+        XLSX.writeFile(wb, 'Nhietdo_data.xlsx');
+        });
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    </body>
+</html>
