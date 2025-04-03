@@ -29,7 +29,7 @@
      // Era Widget initialization
      const eraWidget = new EraWidget();
         let config = null;
-        let sensor7Value = 0; // Khởi tạo giá trị giá trị mặc định
+        let sensor7Value ; // Khởi tạo giá trị giá trị mặc định
         const dataBuffer = [];
         eraWidget.init({
             needRealtimeConfigs: true,         /* Cần giá trị hiện thời */
@@ -52,9 +52,10 @@
             sensor7Value = values[config.id].value; // Giả sử values[config.id].value là giá trị thực tế
             input.checked = values[config.id].value > 0; // Đặt trạng thái của checkbox dựa trên giá trị
         },
-    });
+    
 
-        eraWidget.ready();
+       // eraWidget.ready();
+    });
         // Create the chart
 Highcharts.stockChart('container', {
     chart: {
