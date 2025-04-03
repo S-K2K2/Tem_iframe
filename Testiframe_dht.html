@@ -31,16 +31,28 @@
         let config = null;
         let sensor7Value = 0; // Khởi tạo giá trị giá trị mặc định
         const dataBuffer = [];
+        eraWidget.init({
+            needRealtimeConfigs: true,         /* Cần giá trị hiện thời */
+            needHistoryConfigs: true,          /* Cần giá trị lịch sử */
+            needActions: true,                 /* Cần các hành động (ví dụ Bật/Tắt đèn) */
+            maxRealtimeConfigsCount: 3,        /* Số lượng tối đa giá trị hiện thời */
+            maxHistoryConfigsCount: 1,         /* Số lượng tối đa giá trị lịch sử */
+            maxActionsCount: 2,                /* Số lượng tối đa các hành động có thể kích hoạt */
+            minRealtimeConfigsCount: 0,        /* Số lượng tối thiểu giá trị hiện thời */
+            minHistoryConfigsCount: 0,         /* Số lượng tối thiểu giá trị lịch sử */
+            minActionsCount: 0,                /* Số lượng tối thiểu hành động */
+            mobileHeight: 600,                 /* Thiết lập chiều cao hiển thị trên mobile app E-Ra, mặc đinh 300px */
 
-        eraWidget.onConfiguration((configuration) => {
+        onConfiguration:(configuration) => {
             config = configuration.realtime_configs[0];
-        });
+        },
 
-        eraWidget.onValues((values) => {
-            const input = document.getElementById('Dong dien');
+        onValues:(values) => {
+            const input = document.getElementById('Nhiet do');
             sensor7Value = values[config.id].value; // Giả sử values[config.id].value là giá trị thực tế
             input.checked = values[config.id].value > 0; // Đặt trạng thái của checkbox dựa trên giá trị
-        });
+        },
+    });
 
         eraWidget.ready();
         // Create the chart
